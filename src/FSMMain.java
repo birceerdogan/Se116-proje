@@ -1,10 +1,28 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class FSMMain {
+
+
+    private static void processFile(String fileName) {
+        try (Scanner fileScanner = new Scanner(new File(fileName))) {
+            while (fileScanner.hasNextLine()) {
+                String line = fileScanner.nextLine().trim();
+                if (!line.isEmpty()) {
+                    System.out.println(">> " + line);
+                    processCommand(line);
+                }
+            }
+        }
+        catch (FileNotFoundException e) {
+            System.out.println("File not found: " + fileName);
+        }
+        catch (Exception e) {
+            System.out.println("An error occurred while reading the file: " + e.getMessage());
+        }
+    }
     private static class FSMSerializable implements Serializable {
         private static final long serialVersionUID = 1L;
         private Set<Character> symbols;
