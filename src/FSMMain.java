@@ -1,36 +1,10 @@
-import java.io.*;
-import java.util.*;
-import java.time.*;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class FSMMain {
-    private static final String VERSION = "1.0";
-    private static Set<Character> symbols = new HashSet<>();
-    private static Set<String> states = new HashSet<>();
-    private static String initialState = null;
-    private static Set<String> finalStates = new HashSet<>();
-    private static Map<String, Map<Character, String>> transitions = new HashMap<>();
-    private static PrintWriter logWriter = null;
-    private static boolean loggingEnabled = false;
-    private static String logFileName = "";
-
-    private static void processFile(String fileName) {
-        try (Scanner fileScanner = new Scanner(new File(fileName))) {
-            while (fileScanner.hasNextLine()) {
-                String line = fileScanner.nextLine().trim();
-                if (!line.isEmpty()) {
-                    System.out.println(">> " + line);
-                    processCommand(line);
-                }
-            }
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("File not found: " + fileName);
-        }
-        catch (Exception e) {
-            System.out.println("An error occurred while reading the file: " + e.getMessage());
-        }
-    }
-
     private static class FSMSerializable implements Serializable {
         private static final long serialVersionUID = 1L;
         private Set<Character> symbols;
