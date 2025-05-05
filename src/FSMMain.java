@@ -5,6 +5,56 @@ import java.time.*;
 
 public class FSMMain {
 
+    private static void handleExecute(String args) {
+        if (args.isEmpty()) {
+            System.out.println("Error: No input string specified");
+            return;
+        }
+
+        if (initialState == null) {
+            System.out.println("Error: No initial state defined");
+            return;
+        }
+
+        String currentState = initialState;
+        StringBuilder path = new StringBuilder(currentState + " ");
+        boolean error = false;
+
+        for (int i = 0; i < args.length(); i++) {
+            char symbol = args.charAt(i);
+
+            if (!symbols.contains(symbol)) {
+                System.out.println("Error: Symbol '" + symbol + "' not declared");
+                error = true;
+                break;
+            }
+
+            if (!transitions.containsKey(currentState)) {
+                System.out.println("Error: No transitions defined from state '" + currentState + "'");
+                error = true;
+                break;
+            }
+
+            Map<Character, String> stateTransitions = transitions.get(currentState);
+            if (!stateTransitions.containsKey(symbol)) {
+                System.out.println("Error: No transition for symbol '" + symbol + "' from state '" + currentState + "'");
+                error = true;
+                break;
+            }
+
+            currentState = stateTransitions.get(symbol);
+            path.append(currentState).append(" ");
+        }
+
+        if (!error) {
+            System.out.print(path.toString().trim());
+            if (finalStates.contains(currentState)) {
+                System.out.println(" YES");
+            } else {
+                System.out.println(" NO");
+            }
+        }
+    }
 
     private static void processFile(String fileName) {
         try (Scanner fileScanner = new Scanner(new File(fileName))) {
