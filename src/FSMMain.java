@@ -14,7 +14,46 @@ public class FSMMain {
     private static boolean loggingEnabled = false;
     private static String logFileName = "";
 
+    public static void main(String[] args) {
+        if (args.length > 0) {
+            processFile(args[0]);
+            return;
+        }
 
+        System.out.printf("FSM DESIGNER %s %s%n", VERSION, LocalDateTime.now());
+        System.out.print("? ");
+
+        Scanner scanner = new Scanner(System.in);
+        StringBuilder commandBuilder = new StringBuilder();
+        boolean inCommand = false;
+
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine().trim();
+
+            if (line.isEmpty()) {
+                System.out.print("? ");
+                continue;
+            }
+
+
+            if (line.startsWith(";")) {
+                System.out.print("? ");
+                continue;
+            }
+
+
+            commandBuilder.append(line).append(" ");
+
+
+            if (line.contains(";")) {
+                String fullCommand = commandBuilder.toString().trim();
+                processCommand(fullCommand.substring(0, fullCommand.indexOf(';')).trim());
+                commandBuilder.setLength(0);
+                System.out.print("? ");
+            }
+        }
+        scanner.close();
+    }
 
 
 
