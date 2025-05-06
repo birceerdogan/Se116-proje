@@ -4,6 +4,54 @@ import java.time.*;
 
 
 public class FSMMain {
+    private static void handlePrint(String args) {
+        if (args.isEmpty()) {
+            // Print to console
+            System.out.println("SYMBOLS " + symbols);
+            System.out.println("STATES " + states);
+            System.out.println("INITIAL STATE " + initialState);
+            System.out.println("FINAL STATES " + finalStates);
+
+            StringBuilder sb = new StringBuilder("TRANSITIONS ");
+            for (String fromState : transitions.keySet()) {
+                Map<Character, String> stateTransitions = transitions.get(fromState);
+                for (Character symbol : stateTransitions.keySet()) {
+                    sb.append(symbol).append(" ").append(fromState)
+                            .append(" ").append(stateTransitions.get(symbol)).append(", ");
+                }
+            }
+            if (sb.length() > 12) {
+                System.out.println(sb.substring(0, sb.length() - 2));
+            } else {
+                System.out.println(sb.toString());
+            }
+        } else {
+            // Print to file
+            try (PrintWriter writer = new PrintWriter(new FileWriter(args))) {
+                writer.println("SYMBOLS " + symbols);
+                writer.println("STATES " + states);
+                writer.println("INITIAL-STATE " + initialState + ";");
+                writer.println("FINAL-STATES " + finalStates + ";");
+
+                StringBuilder sb = new StringBuilder("TRANSITIONS ");
+                for (String fromState : transitions.keySet()) {
+                    Map<Character, String> stateTransitions = transitions.get(fromState);
+                    for (Character symbol : stateTransitions.keySet()) {
+                        sb.append(symbol).append(" ").append(fromState)
+                                .append(" ").append(stateTransitions.get(symbol)).append(", ");
+                    }
+                }
+                if (sb.length() > 12) {
+                    writer.println(sb.substring(0, sb.length() - 2) + ";");
+                } else {
+                    writer.println(sb.toString() + ";");
+                }
+                System.out.println("FSM definition written to " + args);
+            } catch (IOException e) {
+                System.out.println("Error writing to file '" + args + "': " + e.getMessage());
+            }
+        }
+    }
 
     private static void handleCompile(String args) {
         if (args.isEmpty()) {
