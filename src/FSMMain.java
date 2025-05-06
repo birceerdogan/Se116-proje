@@ -5,6 +5,36 @@ import java.time.*;
 
 public class FSMMain {
 
+
+    private static void handleFinalStates(String args) {
+        if (args.isEmpty()) {
+            // Print final states
+            if (finalStates.isEmpty()) {
+                System.out.println("No final states defined");
+            } else {
+                System.out.println("Final states: " + finalStates);
+            }
+        } else {
+            // Add new final states
+            String[] newFinalStates = args.split("\\s+");
+            for (String state : newFinalStates) {
+                if (!state.matches("[a-zA-Z0-9]+")) {
+                    System.out.println("Warning: State '" + state + "' is not alphanumeric");
+                    continue;
+                }
+                if (!states.contains(state)) {
+                    states.add(state);
+                    System.out.println("Warning: State '" + state + "' was not previously declared");
+                }
+                if (finalStates.contains(state)) {
+                    System.out.println("Warning: State '" + state + "' was already declared as final");
+                } else {
+                    finalStates.add(state);
+                }
+            }
+        }
+    }
+
     private static void handleTransitions(String args) {
         if (args.isEmpty()) {
             // Print all transitions
