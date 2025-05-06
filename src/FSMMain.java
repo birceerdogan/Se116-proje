@@ -14,7 +14,37 @@ public class FSMMain {
     private static boolean loggingEnabled = false;
     private static String logFileName = "";
 
+    private static void handleExit() {
+        System.out.println("TERMINATED BY USER");
+        if (loggingEnabled) {
+            logWriter.close();
+        }
+        System.exit(0);
+    }
 
+    private static void handleLog(String args) {
+        if (args.isEmpty()) {
+            if (loggingEnabled) {
+                logWriter.close();
+                loggingEnabled = false;
+                System.out.println("STOPPED LOGGING");
+            } else {
+                System.out.println("LOGGING was not enabled");
+            }
+        } else {
+            try {
+                if (loggingEnabled) {
+                    logWriter.close();
+                }
+                logFileName = args;
+                logWriter = new PrintWriter(new FileWriter(logFileName));
+                loggingEnabled = true;
+                System.out.println("LOGGING STARTED to " + logFileName);
+            } catch (IOException e) {
+                System.out.println("Error: Could not open log file '" + args + "': " + e.getMessage());
+            }
+        }
+    }
     private static void handleSymbols(String args) {
         if (args.isEmpty()) {
             // Print existing symbols
