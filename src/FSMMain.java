@@ -5,6 +5,70 @@ import java.time.*;
 
 public class FSMMain {
 
+
+    private static void handleClear() {
+        symbols.clear();
+        states.clear();
+        initialState = null;
+        finalStates.clear();
+        transitions.clear();
+        System.out.println("FSM cleared");
+    }
+
+    private static void handleLoad(String args) {
+        if (args.isEmpty()) {
+            System.out.println("Error: No filename specified");
+            return;
+        }
+
+        // Try to load as binary first
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(args))) {
+            FSMSerializable fsm = (FSMSerializable) ois.readObject();
+            symbols = new HashSet<>(fsm.getSymbols());
+            states = new HashSet<>(fsm.getStates());
+            initialState = fsm.getInitialState();
+            finalStates = new HashSet<>(fsm.getFinalStates());
+            transitions = new HashMap<>(fsm.getTransitions());
+            System.out.println("FSM loaded from compiled file");
+            return;
+        } catch (Exception e) {
+            // Not a binary file, try as text file
+        }
+
+        // Load as text file
+        try (Scanner fileScanner = new Scanner(new File(args))) {
+            StringBuilder commandBuilder = new StringBuilder();
+            int lineNumber = 0;
+
+            while (fileScanner.hasNextLine()) {
+                lineNumber++;
+                String line = fileScanner.nextLine().trim();
+
+                if (line.isEmpty() || line.startsWith(";")) {
+                    continue;
+                }
+
+                commandBuilder.append(line).append(" ");
+
+                if (line.contains(";")) {
+                    String fullCommand = commandBuilder.toString().trim();
+                    String command = fullCommand.substring(0, fullCommand.indexOf(';')).trim();
+
+                    try {
+                        processCommand(command);
+                    } catch (Exception e) {
+                        System.out.println("Error in line " + lineNumber + ": " + e.getMessage());
+                    }
+
+                    commandBuilder.setLength(0);
+                }
+            }
+            System.out.println("FSM commands loaded from text file");
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: File '" + args + "' not found");
+        }
+    }
+
     private static void handleExecute(String args) {
         if (args.isEmpty()) {
             System.out.println("Error: No input string specified");
