@@ -14,6 +14,73 @@ public class FSMMain {
     private static boolean loggingEnabled = false;
     private static String logFileName = "";
 
+
+
+
+
+    private static void processCommand(String command) {
+        if (loggingEnabled) {
+            logWriter.println("> " + command);
+            logWriter.flush();
+        }
+
+        if (command.isEmpty()) {
+            return;
+        }
+
+        String[] parts = command.split("\\s+", 2);
+        String cmd = parts[0].toUpperCase();
+        String args = parts.length > 1 ? parts[1] : "";
+
+        try {
+            switch (cmd) {
+                case "EXIT":
+                    handleExit();
+                    break;
+                case "LOG":
+                    handleLog(args);
+                    break;
+                case "SYMBOLS":
+                    handleSymbols(args);
+                    break;
+                case "STATES":
+                    handleStates(args);
+                    break;
+                case "INITIAL-STATE":
+                case "INITIALSTATE":
+                case "INITIAL":
+                    handleInitialState(args);
+                    break;
+                case "FINAL-STATES":
+                case "FINALSTATES":
+                case "FINAL":
+                    handleFinalStates(args);
+                    break;
+                case "TRANSITIONS":
+                    handleTransitions(args);
+                    break;
+                case "PRINT":
+                    handlePrint(args);
+                    break;
+                case "COMPILE":
+                    handleCompile(args);
+                    break;
+                case "CLEAR":
+                    handleClear();
+                    break;
+                case "LOAD":
+                    handleLoad(args);
+                    break;
+                case "EXECUTE":
+                    handleExecute(args);
+                    break;
+                default:
+                    System.out.println("Error: Invalid command '" + cmd + "'");
+            }
+        } catch (Exception e) {
+            System.out.println("Error processing command: " + e.getMessage());
+        }
+    }
     private static void handleExit() {
         System.out.println("TERMINATED BY USER");
         if (loggingEnabled) {
