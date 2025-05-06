@@ -5,6 +5,29 @@ import java.time.*;
 
 public class FSMMain {
 
+    private static void handleInitialState(String args) {
+        if (args.isEmpty()) {
+            System.out.println("Error: No state specified");
+            return;
+        }
+
+        String state = args.split("\\s+")[0];
+        if (!state.matches("[a-zA-Z0-9]+")) {
+            System.out.println("Warning: State '" + state + "' is not alphanumeric");
+            return;
+        }
+
+        if (!states.contains(state)) {
+            states.add(state);
+            System.out.println("Warning: State '" + state + "' was not previously declared");
+        }
+
+        initialState = state;
+        System.out.println("Initial state set to '" + state + "'");
+    }
+
+
+
 
     private static void handleFinalStates(String args) {
         if (args.isEmpty()) {
