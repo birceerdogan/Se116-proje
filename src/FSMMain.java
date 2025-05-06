@@ -4,7 +4,48 @@ import java.time.*;
 
 
 public class FSMMain {
+    private static final String VERSION = "1.0";
+    private static Set<Character> symbols = new HashSet<>();
+    private static Set<String> states = new HashSet<>();
+    private static String initialState = null;
+    private static Set<String> finalStates = new HashSet<>();
+    private static Map<String, Map<Character, String>> transitions = new HashMap<>();
+    private static PrintWriter logWriter = null;
+    private static boolean loggingEnabled = false;
+    private static String logFileName = "";
 
+
+    private static void handleSymbols(String args) {
+        if (args.isEmpty()) {
+            // Print existing symbols
+            if (symbols.isEmpty()) {
+                System.out.println("No symbols defined");
+            } else {
+                List<Character> sortedSymbols = new ArrayList<>(symbols);
+                Collections.sort(sortedSymbols);
+                System.out.println("Symbols: " + sortedSymbols);
+            }
+        } else {
+            // Add new symbols
+            String[] newSymbols = args.split("\\s+");
+            for (String sym : newSymbols) {
+                if (sym.length() != 1) {
+                    System.out.println("Warning: Symbol '" + sym + "' must be exactly one character");
+                    continue;
+                }
+                char c = sym.charAt(0);
+                if (!Character.isLetterOrDigit(c)) {
+                    System.out.println("Warning: Symbol '" + c + "' is not alphanumeric");
+                    continue;
+                }
+                if (symbols.contains(c)) {
+                    System.out.println("Warning: Symbol '" + c + "' was already declared");
+                } else {
+                    symbols.add(c);
+                }
+            }
+        }
+    }
     private static void handleStates(String args) {
         if (args.isEmpty()) {
             // Print existing states
