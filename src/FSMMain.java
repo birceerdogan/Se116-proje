@@ -4,6 +4,83 @@ import java.time.*;
 
 
 public class FSMMain {
+
+    private static void handleTransitions(String args) {
+        if (args.isEmpty()) {
+            // Print all transitions
+            if (transitions.isEmpty()) {
+                System.out.println("No transitions defined");
+            } else {
+                StringBuilder sb = new StringBuilder("Transitions: ");
+                for (String fromState : transitions.keySet()) {
+                    Map<Character, String> stateTransitions = transitions.get(fromState);
+                    for (Character symbol : stateTransitions.keySet()) {
+                        sb.append(symbol).append(" ").append(fromState)
+                                .append(" ").append(stateTransitions.get(symbol)).append(", ");
+                    }
+                }
+                if (sb.length() > 13) {
+                    System.out.println(sb.substring(0, sb.length() - 2));
+                } else {
+                    System.out.println(sb.toString());
+                }
+            }
+            return;
+        }
+
+        // Process transition definitions
+        String[] transitionDefs = args.split(",");
+        for (String def : transitionDefs) {
+            def = def.trim();
+            if (def.isEmpty()) continue;
+
+            String[] parts = def.split("\\s+");
+            if (parts.length != 3) {
+                System.out.println("Error: Invalid transition format '" + def + "'");
+                continue;
+            }
+
+            String symbolStr = parts[0];
+            String fromState = parts[1];
+            String toState = parts[2];
+
+            if (symbolStr.length() != 1) {
+                System.out.println("Error: Symbol must be single character in '" + def + "'");
+                continue;
+            }
+            char symbol = symbolStr.charAt(0);
+
+            if (!symbols.contains(symbol)) {
+                System.out.println("Error: Symbol '" + symbol + "' not declared");
+                continue;
+            }
+            if (!states.contains(fromState)) {
+                System.out.println("Error: State '" + fromState + "' not declared");
+                continue;
+            }
+            if (!states.contains(toState)) {
+                System.out.println("Error: State '" + toState + "' not declared");
+                continue;
+            }
+
+            // Check for existing transition
+            if (!transitions.containsKey(fromState)) {
+                transitions.put(fromState, new HashMap<>());
+            }
+
+            Map<Character, String> stateTransitions = transitions.get(fromState);
+            if (stateTransitions.containsKey(symbol)) {
+                if (!stateTransitions.get(symbol).equals(toState)) {
+                    System.out.println("Warning: Overriding transition for symbol '" + symbol +
+                            "' and state '" + fromState + "'");
+                }
+            }
+            stateTransitions.put(symbol, toState);
+        }
+    }
+
+
+
     private static void handlePrint(String args) {
         if (args.isEmpty()) {
             // Print to console
