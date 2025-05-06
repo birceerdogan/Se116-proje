@@ -5,6 +5,49 @@ import java.time.*;
 
 public class FSMMain {
 
+    private static void handleStates(String args) {
+        if (args.isEmpty()) {
+            // Print existing states
+            if (states.isEmpty()) {
+                System.out.println("No states defined");
+            } else {
+                List<String> sortedStates = new ArrayList<>(states);
+                Collections.sort(sortedStates);
+                StringBuilder sb = new StringBuilder("States: ");
+                for (String state : sortedStates) {
+                    sb.append(state);
+                    if (state.equals(initialState)) {
+                        sb.append("(initial)");
+                    }
+                    if (finalStates.contains(state)) {
+                        sb.append("(final)");
+                    }
+                    sb.append(", ");
+                }
+                System.out.println(sb.substring(0, sb.length() - 2));
+            }
+        } else {
+            // Add new states
+            String[] newStates = args.split("\\s+");
+            for (String state : newStates) {
+                if (!state.matches("[a-zA-Z0-9]+")) {
+                    System.out.println("Warning: State '" + state + "' is not alphanumeric");
+                    continue;
+                }
+                if (states.contains(state)) {
+                    System.out.println("Warning: State '" + state + "' was already declared");
+                } else {
+                    states.add(state);
+                    if (initialState == null) {
+                        initialState = state;
+                        System.out.println("Info: First state '" + state + "' set as initial state");
+                    }
+                }
+            }
+        }
+    }
+
+
     private static void handleInitialState(String args) {
         if (args.isEmpty()) {
             System.out.println("Error: No state specified");
