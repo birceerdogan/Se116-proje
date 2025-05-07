@@ -2,7 +2,6 @@ import java.io.*;
 import java.util.*;
 import java.time.*;
 
-
 public class FSMMain {
     private static final String VERSION = "1.0";
     private static Set<Character> symbols = new HashSet<>();
@@ -54,8 +53,6 @@ public class FSMMain {
         }
         scanner.close();
     }
-
-
 
     private static void processCommand(String command) {
         if (loggingEnabled) {
@@ -120,6 +117,7 @@ public class FSMMain {
             System.out.println("Error processing command: " + e.getMessage());
         }
     }
+
     private static void handleExit() {
         System.out.println("TERMINATED BY USER");
         if (loggingEnabled) {
@@ -151,6 +149,7 @@ public class FSMMain {
             }
         }
     }
+
     private static void handleSymbols(String args) {
         if (args.isEmpty()) {
             // Print existing symbols
@@ -164,6 +163,7 @@ public class FSMMain {
         } else {
             // Add new symbols
             String[] newSymbols = args.split("\\s+");
+            boolean anyAdded = false;
             for (String sym : newSymbols) {
                 if (sym.length() != 1) {
                     System.out.println("Warning: Symbol '" + sym + "' must be exactly one character");
@@ -178,11 +178,22 @@ public class FSMMain {
                     System.out.println("Warning: Symbol '" + c + "' was already declared");
                 } else {
                     symbols.add(c);
+                    anyAdded = true;
                 }
+
             }
+            if (anyAdded) {
+                System.out.println("Symbols defined");
+            }
+
         }
+
     }
+
+
+
     private static void handleStates(String args) {
+        args = args.replace(";", "").trim();
         if (args.isEmpty()) {
             // Print existing states
             if (states.isEmpty()) {
@@ -206,6 +217,7 @@ public class FSMMain {
         } else {
             // Add new states
             String[] newStates = args.split("\\s+");
+            boolean anyAdded = false;
             for (String state : newStates) {
                 if (!state.matches("[a-zA-Z0-9]+")) {
                     System.out.println("Warning: State '" + state + "' is not alphanumeric");
@@ -215,15 +227,18 @@ public class FSMMain {
                     System.out.println("Warning: State '" + state + "' was already declared");
                 } else {
                     states.add(state);
+                    anyAdded = true;
                     if (initialState == null) {
                         initialState = state;
                         System.out.println("Info: First state '" + state + "' set as initial state");
                     }
                 }
             }
+            if (anyAdded) {
+                System.out.println("States defined");
+            }
         }
     }
-
 
     private static void handleInitialState(String args) {
         if (args.isEmpty()) {
@@ -231,7 +246,7 @@ public class FSMMain {
             return;
         }
 
-        String state = args.split("\\s+")[0];
+        String state = args.split("\\s+")[0].trim();
         if (!state.matches("[a-zA-Z0-9]+")) {
             System.out.println("Warning: State '" + state + "' is not alphanumeric");
             return;
@@ -246,9 +261,6 @@ public class FSMMain {
         System.out.println("Initial state set to '" + state + "'");
     }
 
-
-
-
     private static void handleFinalStates(String args) {
         if (args.isEmpty()) {
             // Print final states
@@ -260,7 +272,9 @@ public class FSMMain {
         } else {
             // Add new final states
             String[] newFinalStates = args.split("\\s+");
+            boolean anyAdded = false;
             for (String state : newFinalStates) {
+                state = state.trim();
                 if (!state.matches("[a-zA-Z0-9]+")) {
                     System.out.println("Warning: State '" + state + "' is not alphanumeric");
                     continue;
@@ -273,7 +287,11 @@ public class FSMMain {
                     System.out.println("Warning: State '" + state + "' was already declared as final");
                 } else {
                     finalStates.add(state);
+                    anyAdded = true;
                 }
+            }
+            if (anyAdded) {
+                System.out.println("Final states updated");
             }
         }
     }
@@ -314,8 +332,8 @@ public class FSMMain {
             }
 
             String symbolStr = parts[0];
-            String fromState = parts[1];
-            String toState = parts[2];
+            String fromState = parts[1].toUpperCase();;
+            String toState = parts[2].toUpperCase();;
 
             if (symbolStr.length() != 1) {
                 System.out.println("Error: Symbol must be single character in '" + def + "'");
@@ -351,8 +369,6 @@ public class FSMMain {
             stateTransitions.put(symbol, toState);
         }
     }
-
-
 
     private static void handlePrint(String args) {
         if (args.isEmpty()) {
@@ -417,6 +433,7 @@ public class FSMMain {
             System.out.println("Error compiling to file '" + args + "': " + e.getMessage());
         }
     }
+
     private static void handleClear() {
         symbols.clear();
         states.clear();
@@ -483,11 +500,13 @@ public class FSMMain {
     private static void handleExecute(String args) {
         if (args.isEmpty()) {
             System.out.println("Error: No input string specified");
+            System.out.println("Execution terminated");
             return;
         }
 
         if (initialState == null) {
             System.out.println("Error: No initial state defined");
+            System.out.println("Execution terminated");
             return;
         }
 
@@ -500,12 +519,14 @@ public class FSMMain {
 
             if (!symbols.contains(symbol)) {
                 System.out.println("Error: Symbol '" + symbol + "' not declared");
+                System.out.println("Execution terminated");
                 error = true;
                 break;
             }
 
             if (!transitions.containsKey(currentState)) {
                 System.out.println("Error: No transitions defined from state '" + currentState + "'");
+                System.out.println("Execution terminated");
                 error = true;
                 break;
             }
@@ -513,6 +534,7 @@ public class FSMMain {
             Map<Character, String> stateTransitions = transitions.get(currentState);
             if (!stateTransitions.containsKey(symbol)) {
                 System.out.println("Error: No transition for symbol '" + symbol + "' from state '" + currentState + "'");
+                System.out.println("Execution terminated");
                 error = true;
                 break;
             }
@@ -535,19 +557,17 @@ public class FSMMain {
         try (Scanner fileScanner = new Scanner(new File(fileName))) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine().trim();
-                if (!line.isEmpty()) {
-                    System.out.println(">> " + line);
-                    processCommand(line);
-                }
+                if (line.isEmpty() || line.equals("?")) continue;
+                System.out.println(">> " + line);
+                processCommand(line.replace(";", "").trim());
             }
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             System.out.println("File not found: " + fileName);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("An error occurred while reading the file: " + e.getMessage());
         }
     }
+
     private static class FSMSerializable implements Serializable {
         private static final long serialVersionUID = 1L;
         private Set<Character> symbols;
@@ -577,4 +597,3 @@ public class FSMMain {
             return transitions; }
     }
 }
-
