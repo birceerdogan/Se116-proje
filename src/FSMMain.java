@@ -54,6 +54,7 @@ public class FSMMain {
         scanner.close();
     }
 
+
     private static void processCommand(String command) {
         if (loggingEnabled) {
             logWriter.println("> " + command);
@@ -184,6 +185,9 @@ public class FSMMain {
             }
             if (anyAdded) {
                 System.out.println("Symbols defined");
+            }
+            else {
+                System.out.println("No new symbols added.");
             }
 
         }
@@ -319,7 +323,7 @@ public class FSMMain {
             return;
         }
 
-        // Process transition definitions
+        // Process transition
         String[] transitionDefs = args.split(",");
         for (String def : transitionDefs) {
             def = def.trim();
@@ -372,11 +376,12 @@ public class FSMMain {
 
     private static void handlePrint(String args) {
         if (args.isEmpty()) {
-            // Print to console
+// Print to console
             System.out.println("SYMBOLS " + symbols);
             System.out.println("STATES " + states);
             System.out.println("INITIAL STATE " + initialState);
             System.out.println("FINAL STATES " + finalStates);
+
 
             StringBuilder sb = new StringBuilder("TRANSITIONS ");
             for (String fromState : transitions.keySet()) {
@@ -418,6 +423,8 @@ public class FSMMain {
             }
         }
     }
+
+
 
     private static void handleCompile(String args) {
         if (args.isEmpty()) {
@@ -515,7 +522,7 @@ public class FSMMain {
         boolean error = false;
 
         for (int i = 0; i < args.length(); i++) {
-            char symbol = args.charAt(i);
+            char symbol = Character.toUpperCase(args.charAt(i));
 
             if (!symbols.contains(symbol)) {
                 System.out.println("Error: Symbol '" + symbol + "' not declared");
@@ -557,9 +564,9 @@ public class FSMMain {
         try (Scanner fileScanner = new Scanner(new File(fileName))) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine().trim();
-                if (line.isEmpty() || line.equals("?")) continue;
+                if (line.isEmpty() || line.equals("?")) continue;  // Gizli karakterleri atla
                 System.out.println(">> " + line);
-                processCommand(line.replace(";", "").trim());
+                processCommand(line.replace(";", "").trim());  // Noktalı virgülü temizle
             }
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + fileName);
